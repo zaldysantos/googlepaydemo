@@ -1,0 +1,44 @@
+﻿@inject IJSRuntime _jsRuntime
+
+@page "/checkOut"
+
+<h3>Check Out</h3>
+<p>
+    Your total bill is: <b>@currencyCode @totalPrice</b>
+</p>
+<div id="btnGooglePay"></div>
+
+@code {
+    private string language = "en"; 
+    private string countryCode = "US";
+    private string currencyCode = "USD";
+    private decimal totalPrice = 123.45m; // total amount
+    private List<object> orderItems = new List<object>() // pay items
+    {
+        new { label = $"3 x Dog Food (Bag)", type = "SUBTOTAL", price = "43.00" },
+        new { label = $"2 x Dog Treat (Can)", type = "SUBTOTAL", price = "25.00" },
+        new { label = $"1 x Dog Mat (L)", type = "SUBTOTAL", price = "15.00" },
+        new { label = "Handling Fee", type = "SUBTOTAL", price = "10.00" },
+        new { label = "Delivery Fee", type = "SUBTOTAL", price = "10.00" } ,
+        new { label = "Taxes", type = "SUBTOTAL", price = "20.45" }
+    };
+
+    protected sealed override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var btnGooglePay = await _jsRuntime.InvokeAsync<string>("getObjectInnerHtml", "container");
+        if (btnGooglePay == "")
+        {
+            // draw google pay button
+            await _jsRuntime.InvokeVoidAsync("onGooglePayLoaded");
+            // set google pay details
+            await _jsRuntime.InvokeVoidAsync("setGooglePay", orderItems, countryCode, currencyCode, totalPrice.ToString("0.00"), language);
+        }
+    }
+
+    [JSInvokable]
+    public static async Task<bool> PlaceOrder(object paymentData)
+    {
+        // ToDo: save paymentData, place order
+        return true;
+    }
+}
