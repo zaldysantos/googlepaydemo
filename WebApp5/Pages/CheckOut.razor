@@ -25,7 +25,7 @@
 
     protected sealed override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var btnGooglePay = await _jsRuntime.InvokeAsync<string>("getObjectInnerHtml", "container");
+        var btnGooglePay = await _jsRuntime.InvokeAsync<string>("getObjectInnerHtml", "btnGooglePay");
         if (btnGooglePay == "")
         {
             // draw google pay button
